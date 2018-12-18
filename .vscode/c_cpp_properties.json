@@ -1,0 +1,36 @@
+{
+    "configurations": [
+        {
+            "name": "ESP32-Win",
+            "includePath": [
+                "${workspaceRoot}",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/opt/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/opt/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include-fixed",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/opt/xtensa-esp32-elf/xtensa-esp32-elf/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/opt/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/log/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/json/cJSON"
+            ],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "${workspaceRoot}",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/opt/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/opt/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include-fixed",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/opt/xtensa-esp32-elf/xtensa-esp32-elf/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/opt/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/log/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/json/cJSON"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "${workspaceRoot}/.vscode/browse.vc.db"
+            },
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/bin/cl.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
