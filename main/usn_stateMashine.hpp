@@ -3,12 +3,22 @@
 
     #include "usn_storage.hpp"
     #include "usn_wifi.hpp"
+    #include "usn_gpio.hpp"
+    #include <stdio.h>
 
     #define WIFI_FILE       "/wifi.txt"
     #define MQTT_FILE       "/mqtt.txt"
     #define WIFI_TIMEOUT    5
     #define WIFI_AP_SSID    "ESP32"
     #define WIFI_AP_PASS    "MotDet"
+
+    #define BTN1            21
+    #define BTN2            19
+    #define BTN3            18
+    #define BTN4             5
+    #define BTN5            17
+    #define BTN6            16
+    #define BTN7             4
 
     class cStateMashine{
         private:
@@ -49,6 +59,10 @@
             void _wifiLogin();
             void _unresolvableError();
 
+            static bool btn_val[7];
+            static uint8_t btn_pin[7];
+
+            static void _readBtn(void *pvParameters);
 
         public:
             cStateMashine(cSPIFFSManager* spiffsManager, cWiFi* wifi);

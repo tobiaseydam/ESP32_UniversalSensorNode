@@ -12,6 +12,7 @@
 #include "lwip/sys.h"
 
 #include "usn_storage.hpp"
+#include "usn_lcd.hpp"
 
 #include <string.h>
 
@@ -36,6 +37,12 @@ esp_err_t cWiFi::_event_handler(void *ctx, system_event_t *event){
 	        ESP_LOGI(TAG, "SYSTEM_EVENT_STA_GOT_IP");
 	        ESP_LOGI(TAG, "got ip:%s\n",
 		        ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip));
+            cLCD::lcd_setcursor( 0, 1 );
+            cLCD::lcd_string("SYS: STA_GOT_IP");
+            char ip[16];
+            sprintf(ip, "%s", ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip));
+            cLCD::lcd_setcursor( 0, 2 );
+            cLCD::lcd_string(ip);
             if(server == NULL){
                 server = _http->start_webserver();
             }
@@ -50,6 +57,13 @@ esp_err_t cWiFi::_event_handler(void *ctx, system_event_t *event){
 	        break;
         case SYSTEM_EVENT_AP_START:
 	        ESP_LOGI(TAG, "SYSTEM_EVENT_AP_START");
+            cLCD::lcd_setcursor( 0, 1 );
+            cLCD::lcd_string("SYS: AP_START");
+            char ip2[16];
+            sprintf(ip2, "192.168.1.4");
+            cLCD::lcd_setcursor( 0, 2 );
+            cLCD::lcd_string(ip2);
+            
             if(server == NULL){
                 server = _http->start_webserver();
             }
