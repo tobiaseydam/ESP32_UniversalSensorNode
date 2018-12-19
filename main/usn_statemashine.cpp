@@ -8,6 +8,8 @@
 
 bool cStateMashine::btn_val[7];
 uint8_t cStateMashine::btn_pin[7] = {BTN1, BTN2, BTN3, BTN4, BTN5, BTN6, BTN7};
+cWiFi* cStateMashine::_wifi = NULL;
+cSPIFFSManager* cStateMashine::_spiffs = NULL;
 
 cStateMashine::cStateMashine(cSPIFFSManager* spiffsManager, cWiFi* wifi){
     _spiffs = spiffsManager;
@@ -74,17 +76,14 @@ void cStateMashine::_wifiLookForData(){
 void cStateMashine::_wifiLogin(){
     ESP_LOGI(TAG, "entering: sm_wifi_login");
 
-
-    char* ssid = new char[32];
-    cSPIFFSManager::getSpecialValue(WIFI_SSID, ssid);
-    char* pass = new char[32];
-    cSPIFFSManager::getSpecialValue(WIFI_PASS, pass);
-    ESP_LOGI(TAG, "connectiong to:");
-    ESP_LOGI(TAG, "  SSID: %s", ssid);
-    _wifi->init_sta(ssid, pass);
     //_wifi->init_softap("TEST", "ABCDEFGH");
     _state = UNRESOLVABLE_ERROR;
     //_state = MQTT_LOOK_FOR_DATA;
+
+    
+    cLCD::lcd_clear();
+    cLCD::lcd_setcursor( 0, 1 );
+    cLCD::lcd_string("READY");
     
     return;
 }
@@ -96,7 +95,46 @@ void cStateMashine::_readBtn(void *pvParameters){
             if(btn_val[i]!=val){
                 btn_val[i] = val;
                 ESP_LOGI("Button", "BTN %d = %d", i, val);
+
+                cLCD::lcd_clear();
+                cLCD::lcd_setcursor( 0, 1 );
+
+                if(val && (i>3)){
+                    cLCD::lcd_string("BUTTON PRESSED");
+                    char txt[16];
+                    sprintf(txt, "BTN: %d", i);
+                    cLCD::lcd_setcursor( 0, 2 );
+                    cLCD::lcd_string(txt);
+                }
+                
                 vTaskDelay( 500/ portTICK_PERIOD_MS);
+                if(val){
+                    switch(i){
+                        case 0:{
+                            char* ssid = new char[32];
+                            cSPIFFSManager::getSpecialValue(WIFI_SSID, ssid);
+                            char* pass = new char[32];
+                            cSPIFFSManager::getSpecialValue(WIFI_PASS, pass);
+                            ESP_LOGI(TAG, "connectiong to:");
+                            ESP_LOGI(TAG, "  SSID: %s", ssid);
+                            _wifi->init_sta(ssid, pass);
+                            break;
+                        }
+                        case 1:{
+                            _wifi->init_softap("TEST", "TEST_PASSWORD");
+                            break;
+                        }
+                        case 2:{
+                            _wifi->disconnect();
+                            break;
+                        }
+                        case 3:{
+                            esp_restart();
+                            break;
+                        }
+                    }
+                }
+
             }
         }
     TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;

@@ -37,6 +37,7 @@ esp_err_t cWiFi::_event_handler(void *ctx, system_event_t *event){
 	        ESP_LOGI(TAG, "SYSTEM_EVENT_STA_GOT_IP");
 	        ESP_LOGI(TAG, "got ip:%s\n",
 		        ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip));
+            cLCD::lcd_clear();
             cLCD::lcd_setcursor( 0, 1 );
             cLCD::lcd_string("SYS: STA_GOT_IP");
             char ip[16];
@@ -49,7 +50,11 @@ esp_err_t cWiFi::_event_handler(void *ctx, system_event_t *event){
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED:
 	        ESP_LOGI(TAG, "SYSTEM_EVENT_STA_DISCONNECTED");
-	        ESP_ERROR_CHECK(esp_wifi_connect());
+            cLCD::lcd_clear();
+            cLCD::lcd_setcursor( 0, 1 );
+            cLCD::lcd_string("SYS: STA_DISCONN");
+            
+	        //ESP_ERROR_CHECK(esp_wifi_connect());
             if(server != NULL){
                 cHttp::stop_webserver(*server);
                 server = NULL;
@@ -57,6 +62,7 @@ esp_err_t cWiFi::_event_handler(void *ctx, system_event_t *event){
 	        break;
         case SYSTEM_EVENT_AP_START:
 	        ESP_LOGI(TAG, "SYSTEM_EVENT_AP_START");
+            cLCD::lcd_clear();
             cLCD::lcd_setcursor( 0, 1 );
             cLCD::lcd_string("SYS: AP_START");
             char ip2[16];
@@ -67,6 +73,17 @@ esp_err_t cWiFi::_event_handler(void *ctx, system_event_t *event){
             if(server == NULL){
                 server = _http->start_webserver();
             }
+            break;
+        case SYSTEM_EVENT_AP_STOP:
+	        ESP_LOGI(TAG, "SYSTEM_EVENT_AP_STOP");
+            cLCD::lcd_clear();
+            cLCD::lcd_setcursor( 0, 1 );
+            cLCD::lcd_string("SYS: AP_STOP");
+            
+            if(server == NULL){
+                server = _http->start_webserver();
+            }
+            break;
         default:
             break;
         }
@@ -84,6 +101,11 @@ void cWiFi::init(){
     //ESP_LOGI(TAG, "%p", (void *)cWiFi::_http);
     //ESP_LOGI(TAG, "%p", (void *)_http);
 }
+
+void cWiFi::disconnect(){
+    ESP_ERROR_CHECK(esp_wifi_stop());
+    init();
+};
 
 void cWiFi::init_softap(const char* ssid, const char* pass){
     wifi_event_group = xEventGroupCreate();

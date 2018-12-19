@@ -22,10 +22,10 @@
 
     class cStateMashine{
         private:
-            const char *TAG = "StateMashine";
+            static constexpr char *TAG = (char*)"StateMashine";
 
-            cSPIFFSManager* _spiffs;
-            cWiFi* _wifi;
+            static cSPIFFSManager* _spiffs;
+            static cWiFi* _wifi;
 
             enum eSMState {
                 START, 

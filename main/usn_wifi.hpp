@@ -20,6 +20,7 @@
             void init();
             void init_softap(const char* ssid, const char* pass);
             void init_sta(const char* ssid, const char* pass);
+            void disconnect();
             void scan();
     };
 
