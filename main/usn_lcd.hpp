@@ -1,6 +1,8 @@
 #ifndef USN_LCD_HPP
     #define USN_LCD_HPP
     #include "usn_gpio.hpp"
+    #include <queue>
+    #include <array>
 
     #define LCD_EN                  26
     #define LCD_RS                  14
@@ -104,6 +106,36 @@
             static void lcd_home( void );
             static void lcd_setcursor( uint8_t x, uint8_t y );
             static void lcd_string( const char *data );
+    };
+
+    class display_t{
+        static constexpr uint8_t pinRS = LCD_RS;
+    public:
+        static void run(void* pvParameter);
+    };
+
+    class display_message_t{
+    private:
+        std::array<char, 16> line1;
+        std::array<char, 16> line2;
+    public:
+        display_message_t();
+        display_message_t(const char* l1, const char* l2);
+        void set_line1(const char* format, ...);
+        void set_line2(const char* format, ...);
+    }
+
+    class display_buffer_t{
+        private: 
+            SemaphoreHandle_t semaphore;
+            std::queue<display_message_t> buffer;
+            static display_buffer_t* instance;
+            display_buffer_t();
+        public:
+            display_buffer_t* get();
+            void enqueue(display_buffer_t message); //mutex   (add)
+            display_buffer_t dequeue();
+            bool empty();
     };
 
 #endif
