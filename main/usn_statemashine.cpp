@@ -44,7 +44,7 @@ void cStateMashine::_start(){
     cGPIO::setPinMode(13, OUTPUT);
     // Turn on LCD
     cGPIO::setPin(13, 1);
-    cLCD::lcd_init();
+    //cLCD::lcd_init();
 
     for(uint8_t i = 0; i<7; i++){
         cGPIO::setPinMode(btn_pin[i], INPUT);
@@ -81,9 +81,9 @@ void cStateMashine::_wifiLogin(){
     //_state = MQTT_LOOK_FOR_DATA;
 
     
-    cLCD::lcd_clear();
-    cLCD::lcd_setcursor( 0, 1 );
-    cLCD::lcd_string("READY");
+    //cLCD::lcd_clear();
+    //cLCD::lcd_setcursor( 0, 1 );
+    //cLCD::lcd_string("READY");
     
     return;
 }
@@ -96,15 +96,15 @@ void cStateMashine::_readBtn(void *pvParameters){
                 btn_val[i] = val;
                 ESP_LOGI("Button", "BTN %d = %d", i, val);
 
-                cLCD::lcd_clear();
-                cLCD::lcd_setcursor( 0, 1 );
+                //cLCD::lcd_clear();
+                //cLCD::lcd_setcursor( 0, 1 );
 
                 if(val && (i>3)){
-                    cLCD::lcd_string("BUTTON PRESSED");
-                    char txt[16];
-                    sprintf(txt, "BTN: %d", i);
-                    cLCD::lcd_setcursor( 0, 2 );
-                    cLCD::lcd_string(txt);
+                    //cLCD::lcd_string("BUTTON PRESSED");
+                    //char txt[16];
+                    //sprintf(txt, "BTN: %d", i);
+                    //cLCD::lcd_setcursor( 0, 2 );
+                    //cLCD::lcd_string(txt);
                 }
                 
                 vTaskDelay( 500/ portTICK_PERIOD_MS);

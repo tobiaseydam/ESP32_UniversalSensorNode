@@ -9,8 +9,13 @@
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
 #include <stdio.h>
+#include <algorithm>
+
+
+//----- display_t ----------------------------------------------
+
 // Erzeugt einen Enable-Puls
-void cLCD::lcd_enable(){
+void display_t::lcd_enable(){
     //LCD_PORT |= (1<<LCD_EN);     // Enable auf 1 setzen
     cGPIO::setPin(LCD_EN, 1);
     //_delay_us( LCD_ENABLE_US );  // kurze Pause
@@ -20,19 +25,13 @@ void cLCD::lcd_enable(){
 }
 
 // Sendet eine 4-bit Ausgabeoperation an das LCD
-void cLCD::lcd_out(uint8_t data){
+void display_t::lcd_out(uint8_t data){
     data &= 0xF0;                       // obere 4 Bit maskieren
-    ESP_LOGI("LCD", "data: %d", data);
     uint8_t d7 = (data & 0x80)>>7;
     uint8_t d6 = (data & 0x40)>>6;
     uint8_t d5 = (data & 0x20)>>5;
     uint8_t d4 = (data & 0x10)>>4;
-    ESP_LOGI("LCD", "d7: %d", d7);
-    ESP_LOGI("LCD", "d6: %d", d6);
-    ESP_LOGI("LCD", "d5: %d", d5);
-    ESP_LOGI("LCD", "d4: %d", d4);
     
-
     //LCD_PORT &= ~(0xF0>>(4-LCD_DB));    // Maske löschen
     cGPIO::setPin(LCD_DB7,0);
     cGPIO::setPin(LCD_DB6,0);
@@ -45,10 +44,10 @@ void cLCD::lcd_out(uint8_t data){
     cGPIO::setPin(LCD_DB5,d5);
     cGPIO::setPin(LCD_DB4,d4);
 
-    cLCD::lcd_enable();
+    display_t::lcd_enable();
 }
 
-void cLCD::lcd_init(){
+void display_t::lcd_init(){
     // verwendete Pins auf Ausgang schalten
     //uint8_t pins = (0x0F << LCD_DB) |           // 4 Datenleitungen
     //               (1<<LCD_RS) |                // R/S Leitung
@@ -76,76 +75,76 @@ void cLCD::lcd_init(){
     vTaskDelay( LCD_BOOTUP_MS / portTICK_PERIOD_MS);
     
     // Soft-Reset muss 3mal hintereinander gesendet werden zur Initialisierung
-    cLCD::lcd_out( LCD_SOFT_RESET );
+    display_t::lcd_out( LCD_SOFT_RESET );
     vTaskDelay( LCD_SOFT_RESET_MS1 / portTICK_PERIOD_MS);
  
-    cLCD::lcd_enable();
+    display_t::lcd_enable();
     vTaskDelay( LCD_SOFT_RESET_MS2 / portTICK_PERIOD_MS);
  
-    cLCD::lcd_enable();
+    display_t::lcd_enable();
     vTaskDelay( LCD_SOFT_RESET_MS3 / portTICK_PERIOD_MS);
  
     // 4-bit Modus aktivieren 
-    cLCD::lcd_out( LCD_SET_FUNCTION |
+    display_t::lcd_out( LCD_SET_FUNCTION |
              LCD_FUNCTION_4BIT );
     vTaskDelay( LCD_SET_4BITMODE_MS / portTICK_PERIOD_MS);
  
     // 4-bit Modus / 2 Zeilen / 5x7
-    cLCD::lcd_command( LCD_SET_FUNCTION |
+    display_t::lcd_command( LCD_SET_FUNCTION |
                  LCD_FUNCTION_4BIT |
                  LCD_FUNCTION_2LINE |
                  LCD_FUNCTION_5X7 );
  
     // Display ein / Cursor aus / Blinken aus
-    cLCD::lcd_command( LCD_SET_DISPLAY |
+    display_t::lcd_command( LCD_SET_DISPLAY |
                  LCD_DISPLAY_ON |
                  LCD_CURSOR_OFF |
                  LCD_BLINKING_OFF); 
  
     // Cursor inkrement / kein Scrollen
-    cLCD::lcd_command( LCD_SET_ENTRY |
+    display_t::lcd_command( LCD_SET_ENTRY |
                  LCD_ENTRY_INCREASE |
                  LCD_ENTRY_NOSHIFT );
  
-    cLCD::lcd_clear();
+    display_t::lcd_clear();
 }
 
 // Sendet ein Datenbyte an das LCD
-void cLCD::lcd_data( uint8_t data ){
+void display_t::lcd_data( uint8_t data ){
     //LCD_PORT |= (1<<LCD_RS);    // RS auf 1 setzen
     cGPIO::setPin(LCD_RS,1);
 
-    cLCD::lcd_out( data );            // zuerst die oberen, 
-    cLCD::lcd_out( data<<4 );         // dann die unteren 4 Bit senden
+    display_t::lcd_out( data );            // zuerst die oberen, 
+    display_t::lcd_out( data<<4 );         // dann die unteren 4 Bit senden
  
     vTaskDelay( LCD_WRITEDATA_US / portTICK_PERIOD_MS);
 }
 
 // Sendet einen Befehl an das LCD
-void cLCD::lcd_command( uint8_t data ){
+void display_t::lcd_command( uint8_t data ){
     //LCD_PORT &= ~(1<<LCD_RS);    // RS auf 0 setzen
     cGPIO::setPin(LCD_RS,0);
 
-    cLCD::lcd_out( data );             // zuerst die oberen, 
-    cLCD::lcd_out( data<<4 );           // dann die unteren 4 Bit senden
+    display_t::lcd_out( data );             // zuerst die oberen, 
+    display_t::lcd_out( data<<4 );           // dann die unteren 4 Bit senden
  
     vTaskDelay( LCD_COMMAND_US / portTICK_PERIOD_MS);
 }
 
 // Sendet den Befehl zur Löschung des Displays
-void cLCD::lcd_clear( void ){
-    cLCD::lcd_command( LCD_CLEAR_DISPLAY );
+void display_t::lcd_clear( void ){
+    display_t::lcd_command( LCD_CLEAR_DISPLAY );
     vTaskDelay( LCD_CLEAR_DISPLAY_MS / portTICK_PERIOD_MS);
 }
 
 // Sendet den Befehl: Cursor Home
-void cLCD::lcd_home( void ){
-    cLCD::lcd_command( LCD_CURSOR_HOME );
+void display_t::lcd_home( void ){
+    display_t::lcd_command( LCD_CURSOR_HOME );
     vTaskDelay( LCD_CURSOR_HOME_MS / portTICK_PERIOD_MS);
 }
 
 // Setzt den Cursor in Spalte x (0..15) Zeile y (1..4) 
-void cLCD::lcd_setcursor( uint8_t x, uint8_t y ){
+void display_t::lcd_setcursor( uint8_t x, uint8_t y ){
     uint8_t data;
  
     switch (y)
@@ -170,12 +169,94 @@ void cLCD::lcd_setcursor( uint8_t x, uint8_t y ){
             return;                                   // für den Fall einer falschen Zeile
     }
  
-    cLCD::lcd_command( data );
+    display_t::lcd_command( data );
 }
 
-void cLCD::lcd_string( const char *data ){
+void display_t::lcd_string( const char *data ){
     while( *data != '\0' )
-        cLCD::lcd_data( *data++ );
+        display_t::lcd_data( *data++ );
 }
+
+
+void display_t::run(void* pvParameter){
+    display_buffer_t* db = (display_buffer_t*)pvParameter;
+    while(true){
+        if(!(db->empty())){
+            display_message_t* dm = db->dequeue();
+            display_t::lcd_clear();
+            display_t::lcd_setcursor(0,1);
+            display_t::lcd_string(dm->get_line1());
+            display_t::lcd_setcursor(0,2);
+            display_t::lcd_string(dm->get_line2());
+            delete(db);
+        }
+    }
+}
+
+//----- display_message_t --------------------------------------
+
+display_message_t::display_message_t(){
+    _init();
+}
+
+display_message_t::display_message_t(const char* l1, const char* l2){
+    _init();
+    strncpy(line1, l1, strlen(l1));
+    strncpy(line2, l2, strlen(l2));
+}
+
+void display_message_t::_init(){
+    memset(&line1, '\0', 16);
+    memset(&line2, '\0', 16);
+}
+
+/*
+void display_message_t::set_line1(const char* format, ...){
+
+}
+
+void display_message_t::set_line2(const char* format, ...){
+
+}
+*/
+
+void display_message_t::printToSerial(){
+    ESP_LOGI("display_message", "MESSAGE: ");
+    ESP_LOGI("display_message", "%s", line1);
+    ESP_LOGI("display_message", "%s", line2);
+}
+
+const char* display_message_t::get_line1(){
+    return line1;
+}
+
+const char* display_message_t::get_line2(){
+    return line2;
+}
+
+//----- display_buffer_t ---------------------------------------
+
+display_buffer_t::display_buffer_t(){
+    ESP_LOGI("display_buffer", "init queue");
+    buffer = xQueueCreate(10, sizeof(display_message_t*));
+}
+
+void display_buffer_t::enqueue(display_message_t* message){
+    ESP_LOGI("display_buffer", "add to queue");
+    xQueueSendToBack(buffer, &message, 0);
+    len += 1;
+}
+
+display_message_t* display_buffer_t::dequeue(){
+    display_message_t* message;
+    xQueueReceive(buffer, &message, 10);
+    len -= 1;
+    return message;
+}
+
+bool display_buffer_t::empty(){
+    return len==0;
+}
+
 
 
