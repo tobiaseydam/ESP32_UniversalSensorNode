@@ -188,7 +188,7 @@ void display_t::run(void* pvParameter){
             display_t::lcd_string(dm->get_line1());
             display_t::lcd_setcursor(0,2);
             display_t::lcd_string(dm->get_line2());
-            delete(db);
+            //delete(db);
         }
     }
 }
@@ -201,13 +201,13 @@ display_message_t::display_message_t(){
 
 display_message_t::display_message_t(const char* l1, const char* l2){
     _init();
-    strncpy(line1, l1, strlen(l1));
-    strncpy(line2, l2, strlen(l2));
+    strncpy(_line1, l1, strlen(l1));
+    strncpy(_line2, l2, strlen(l2));
 }
 
 void display_message_t::_init(){
-    memset(&line1, '\0', 16);
-    memset(&line2, '\0', 16);
+    memset(&_line1, '\0', 16);
+    memset(&_line2, '\0', 16);
 }
 
 /*
@@ -222,40 +222,42 @@ void display_message_t::set_line2(const char* format, ...){
 
 void display_message_t::printToSerial(){
     ESP_LOGI("display_message", "MESSAGE: ");
-    ESP_LOGI("display_message", "%s", line1);
-    ESP_LOGI("display_message", "%s", line2);
+    ESP_LOGI("display_message", "%s", _line1);
+    ESP_LOGI("display_message", "%s", _line2);
 }
 
 const char* display_message_t::get_line1(){
-    return line1;
+    return _line1;
 }
 
 const char* display_message_t::get_line2(){
-    return line2;
+    return _line2;
 }
 
 //----- display_buffer_t ---------------------------------------
 
 display_buffer_t::display_buffer_t(){
-    ESP_LOGI("display_buffer", "init queue");
-    buffer = xQueueCreate(10, sizeof(display_message_t*));
+    ESP_LOGD(TAG, "init queue");
+    _buffer = xQueueCreate(10, sizeof(display_message_t*));
 }
 
 void display_buffer_t::enqueue(display_message_t* message){
-    ESP_LOGI("display_buffer", "add to queue");
-    xQueueSendToBack(buffer, &message, 0);
-    len += 1;
+    ESP_LOGD(TAG, "add to queue");
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xQueueSendToBackFromISR(_buffer, &message, &xHigherPriorityTaskWoken);
+    _len += 1;
 }
 
 display_message_t* display_buffer_t::dequeue(){
     display_message_t* message;
-    xQueueReceive(buffer, &message, 10);
-    len -= 1;
+    BaseType_t xTaskWokenByReceive = pdFALSE;
+    xQueueReceiveFromISR(_buffer, &message, &xTaskWokenByReceive);
+    _len -= 1;
     return message;
 }
 
 bool display_buffer_t::empty(){
-    return len==0;
+    return _len==0;
 }
 
 

@@ -7,13 +7,13 @@
 #include "cJSON.h"      //  https://github.com/DaveGamble/cJSON/tree/7cc52f60356909b3dd260304c7c50c0693699353
 #include <math.h>
 
-std::map<eSpecialValue, const char*> cSPIFFSManager::specialValues;
+//----- storage_adapter ------------------------------------------------
 
-cSPIFFSManager::cSPIFFSManager(){
-    
+storage_adapter::storage_adapter(){
+
 }
 
-void cSPIFFSManager::init(){
+void storage_adapter::init(){
     ESP_LOGI(TAG, "Initializing SPIFFS");
 
     esp_vfs_spiffs_conf_t conf = {
@@ -22,9 +22,9 @@ void cSPIFFSManager::init(){
       .max_files = 5,
       .format_if_mount_failed = true
     };
-
-    esp_err_t ret = esp_vfs_spiffs_register(&conf);    
-
+    
+    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+    
     if (ret != ESP_OK) {
         if (ret == ESP_FAIL) {
             ESP_LOGE(TAG, "Failed to mount or format filesystem");
@@ -44,55 +44,60 @@ void cSPIFFSManager::init(){
         ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
     }
 
-    restoreSpecialValue();
+    load_global_values();
 }
 
-bool cSPIFFSManager::fileExists(const char* filename){
+void storage_adapter::set_display_buffer(display_buffer_t* db){
+    _db = db;
+}
+
+bool storage_adapter::file_exists(const char* filename){
     struct stat st;
     return (stat(filename, &st)==0);
 }
 
-DIR* cSPIFFSManager::getRootFolder(){
+DIR* storage_adapter::get_root_folder(){
     return opendir("/spiffs");
 }
 
-FILE* cSPIFFSManager::getFile(const char* filename){
-    if(fileExists(filename)){
+FILE* storage_adapter::get_file(const char* filename){
+    if(file_exists(filename)){
         return fopen(filename, "r");
     }else{
         return NULL;
     }
 }
 
-void cSPIFFSManager::_printMap(){
-    for (auto const& x : specialValues){
-        ESP_LOGI(TAG, "%i - %s", x.first, x.second);
+void storage_adapter::_print_map(){
+    for (auto const& x : global_values){
+        ESP_LOGI(TAG, "%i - %s : %s", x.first, s_global_value[x.first] , x.second);
     }
 }
 
-void cSPIFFSManager::getSpecialValue(eSpecialValue key, char* buffer){
-    strcpy(buffer, specialValues.at(key));
-};
-            
-void cSPIFFSManager::setSpecialValue(eSpecialValue key, char* buffer){
-    specialValues[key] = buffer;
-    ESP_LOGI(TAG, "Value updated: %i = %s", key, specialValues[key]);
-};
-            
-void cSPIFFSManager::setSpecialValue(char* key, char* buffer){
-    for(uint8_t i = WIFI_SSID; i<=WIFI_PASS; i++){
-        if(strcmp(sSpecialValue[i], key)==0){
-            specialValues[eSpecialValue(i)] = buffer;
-            ESP_LOGI(TAG, "Value updated: %s = %s", key, specialValues[eSpecialValue(i)]);
+void storage_adapter::set_global_value(e_global_value key, const char* value){
+    global_values[key] = value;
+    ESP_LOGI(TAG, "Value updated: %s = %s", s_global_value[key], global_values[key]);
+}
+
+void storage_adapter::set_global_value(const char* key, const char* value){
+    for(uint8_t i = WIFISSID; i<=_LAST; i++){
+        if(strcmp(s_global_value[i], key)==0){
+            global_values[e_global_value(i)] = value;
+            ESP_LOGI(TAG, "Value updated: %s = %s", key, global_values[e_global_value(i)]);
         }
     }
-};
+}
 
-void cSPIFFSManager::saveSpecialValue(){
+const char* storage_adapter::get_global_value(e_global_value key){
+    return global_values.at(key);
+}
+
+void storage_adapter::save_global_values(){
     cJSON *filecontent = cJSON_CreateObject();
-    for(uint8_t i = WIFI_SSID; i<=WIFI_PASS; i++){
-        cJSON_AddItemToObject(filecontent, sSpecialValue[i], 
-            cJSON_CreateString(specialValues.at(eSpecialValue(i)))
+    for (auto const& x : global_values){
+        cJSON_AddItemToObject(filecontent, 
+            s_global_value[x.first], 
+            cJSON_CreateString(x.second)
         );
     }
     char *string = NULL;
@@ -100,38 +105,38 @@ void cSPIFFSManager::saveSpecialValue(){
     ESP_LOGI(TAG, "JSON created: %s", string);
     cJSON_Delete(filecontent);
 
-    FILE* f = fopen(SPECIALVALUES_FILE, "w");
+    FILE* f = fopen(GLOBALS_FILE, "w");
     fprintf(f, string);
     fclose(f);
 }
-
-void cSPIFFSManager::restoreSpecialValue(){
-    FILE* file = getFile(SPECIALVALUES_FILE);
+            
+void storage_adapter::load_global_values(){
+    FILE* file = get_file(GLOBALS_FILE);
     if(file){
-        char* content = new char[JSONBUFFERLEN];
+        char* content = new char[JSON_BUFFER_LEN];
         struct stat st;
-        stat(SPECIALVALUES_FILE, &st);
+        stat(GLOBALS_FILE, &st);
         fread(content, 1, st.st_size+1, file);
         content[st.st_size] = '\0';
         ESP_LOGI(TAG, "JSON restored: %s", content);
         cJSON* json = cJSON_Parse(content);
 
-        for(uint8_t i = WIFI_SSID; i<=WIFI_PASS; i++){
+        for(uint8_t i = WIFISSID; i<=_LAST; i++){
             const cJSON *val = NULL;
-            val = cJSON_GetObjectItemCaseSensitive(json, sSpecialValue[i]);
+            val = cJSON_GetObjectItemCaseSensitive(json, s_global_value[i]);
             if (cJSON_IsString(val) && (val->valuestring != NULL)){
 
                 char* v = new char[strlen(val->valuestring)+1];
                 memset(v, '\0', strlen(val->valuestring)+1); 
                 strcpy(v, val->valuestring);
 
-                specialValues.insert(std::pair<eSpecialValue, const char*>(eSpecialValue(i), v));
+                global_values.insert(std::pair<e_global_value, const char*>(e_global_value(i), v));
             }
         }
 
         cJSON_Delete(json);
         free(content);  
         fclose(file);     
-        _printMap();
+        _print_map();
     }
 }

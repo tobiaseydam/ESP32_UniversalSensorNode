@@ -5,36 +5,40 @@
     #include <dirent.h>
     #include <map>
 
-    #define SPECIALVALUES_FILE "/spiffs/specialValues.json"  
-    #define JSONBUFFERLEN 1024
+    #include "usn_lcd.hpp"
 
-    enum eSpecialValue {
-        WIFI_SSID, 
-        WIFI_PASS
+    #define GLOBALS_FILE "/spiffs/globals.json"
+    #define JSON_BUFFER_LEN 1024
+
+    enum e_global_value {
+        WIFISSID, 
+        WIFIPASS,
+        _LAST
     };
 
-    const char sSpecialValue[][16] = {"WIFISSID", "WIFIPASS"}; 
+    const char s_global_value[][16] = {"WIFISSID", "WIFIPASS", "_LAST"};
 
-    class cSPIFFSManager{
+    class storage_adapter{
         private:
-            static constexpr char *TAG = (char*)"SPIFFSManager";          
-            
-            static std::map<eSpecialValue, const char*> specialValues;
+            static constexpr char *TAG = (char*)"storage_adapter";    
+            display_buffer_t* _db;
+
+            std::map<e_global_value, const char*> global_values;
+            void load_global_values();
         public:
-            cSPIFFSManager();
-            static void _printMap();
-            static void init();
-            static bool fileExists(const char* filename);
-            static DIR* getRootFolder();
-            static FILE* getFile(const char* filename);
+            storage_adapter();
+            void set_display_buffer(display_buffer_t* db);
 
-            static void getSpecialValue(eSpecialValue key, char* buffer);
-            static void setSpecialValue(eSpecialValue key, char* buffer);
-            static void setSpecialValue(char* key, char* buffer); 
-            static void saveSpecialValue();
-            static void restoreSpecialValue();
+            void _print_map();
+            void init();
 
-            static void test_writeWiFi_File();
+            bool file_exists(const char* filename);
+            DIR* get_root_folder();
+            FILE* get_file(const char* filename);
+            const char* get_global_value(e_global_value key);
+            void set_global_value(e_global_value key, const char* value);
+            void set_global_value(const char* key, const char* value);
+            void save_global_values();
     };
 
 #endif

@@ -6,16 +6,16 @@
 #include <stdio.h>
 #include <dirent.h>
 
-httpd_uri_t cHttp::uri_get;
-httpd_uri_t cHttp::spiffs_get;
+httpd_uri_t http_server::root_get;
+httpd_uri_t http_server::spiffs_get;
+storage_adapter* http_server::_sa = NULL;
 
-
-cHttp::cHttp(){
-    memset(&uri_get, 0, sizeof(uri_get));  
-    uri_get.uri      = "/uri";
-    uri_get.method   = HTTP_GET;
-    uri_get.handler  = get_handler;
-    uri_get.user_ctx = NULL;   
+http_server::http_server(){
+    memset(&root_get, 0, sizeof(root_get));  
+    root_get.uri      = "/";
+    root_get.method   = HTTP_GET;
+    root_get.handler  = get_handler;
+    root_get.user_ctx = NULL;   
 
     memset(&spiffs_get, 0, sizeof(spiffs_get));  
     spiffs_get.uri      = "/spiffs";
@@ -24,7 +24,7 @@ cHttp::cHttp(){
     spiffs_get.user_ctx = NULL;   
 }
 
-paramset_t* cHttp::_parseURI(httpd_req_t *req){
+paramset_t* http_server::_parseURI(httpd_req_t *req){
     uint8_t i = 0;
     uint8_t j = 0;
     uint8_t param_start = 0;
@@ -78,7 +78,7 @@ paramset_t* cHttp::_parseURI(httpd_req_t *req){
 }
 
 
-httpd_handle_t* cHttp::start_webserver(){
+httpd_handle_t* http_server::start_webserver(){
     ESP_LOGI(TAG, "http server started");
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
@@ -87,42 +87,36 @@ httpd_handle_t* cHttp::start_webserver(){
     ESP_LOGI(TAG, "Starting server on port: '%d'", config.server_port);
     if (httpd_start(server, &config) == ESP_OK) {
         ESP_LOGI(TAG, "Registering URI handlers");
-        httpd_register_uri_handler(*server, &uri_get);
+        httpd_register_uri_handler(*server, &root_get);
         httpd_register_uri_handler(*server, &spiffs_get);
     }
     return server;
 }
 
-esp_err_t cHttp::get_handler(httpd_req_t *req){
-    const char resp[] = "URI GET Response";
+esp_err_t http_server::get_handler(httpd_req_t *req){
+    const char resp[] = "GET Response";
     ESP_LOGI(TAG, "get request:");
     ESP_LOGI(TAG, "method: %i", req->method);
     ESP_LOGI(TAG, "uri: %s", req->uri);
     paramset_t* p = _parseURI(req);
 
     for(uint8_t i = 0; i<MAX_PARAMS; i++){
-        /*if(strcmp(p->params[i], "WIFISSID")==0){
-            cSPIFFSManager::setSpecialValue(WIFI_SSID, p->vals[i]);
-        }
-        if(strcmp(p->params[i], "WIFIPASS")==0){
-            cSPIFFSManager::setSpecialValue(WIFI_PASS, p->vals[i]);
-        }*/
-        cSPIFFSManager::setSpecialValue(p->params[i], p->vals[i]);
+        _sa->set_global_value(p->params[i], p->vals[i]);
 
     }
-    cSPIFFSManager::saveSpecialValue();
+    _sa->save_global_values();
 
     httpd_resp_send(req, resp, strlen(resp));
     return ESP_OK;
 }
 
-esp_err_t cHttp::spiffs_get_handler(httpd_req_t *req){
+esp_err_t http_server::spiffs_get_handler(httpd_req_t *req){
     char* resp = new char[127];
     
     paramset_t* p = _parseURI(req);
     if(strcmp(p->params[0], "file")==0){
         if((strcmp(p->params[1], "action")==0)&&(strcmp(p->vals[1], "open")==0)){
-            FILE* file = cSPIFFSManager::getFile(p->vals[0]);
+            FILE* file = _sa->get_file(p->vals[0]);
             if(file){
                 httpd_resp_set_type(req, "text");
 
@@ -140,7 +134,7 @@ esp_err_t cHttp::spiffs_get_handler(httpd_req_t *req){
                 httpd_resp_send(req, resp, strlen(resp));
             }
         }else if((strcmp(p->params[1], "action")==0)&&(strcmp(p->vals[1], "delete")==0)){
-            FILE* file = cSPIFFSManager::getFile(p->vals[0]);
+            FILE* file = _sa->get_file(p->vals[0]);
             if(file){
                 fclose(file);
                 remove(p->vals[0]);
@@ -163,7 +157,7 @@ esp_err_t cHttp::spiffs_get_handler(httpd_req_t *req){
         sprintf(resp, "<table><tr><th>file</th><th>action</th></tr>");
         httpd_resp_send_chunk(req, resp, strlen(resp));
 
-        DIR* root = cSPIFFSManager::getRootFolder();
+        DIR* root = _sa->get_root_folder();
         struct dirent *ent;
         while ((ent = readdir(root)) != NULL) {
             sprintf(resp, "<tr><td>");
@@ -192,12 +186,12 @@ esp_err_t cHttp::spiffs_get_handler(httpd_req_t *req){
     return ESP_OK;
 }
 
-void cHttp::stop_webserver(httpd_handle_t server){
+void http_server::stop_webserver(httpd_handle_t server){
     if (server) {
         httpd_stop(server);
     }
 }
 
-void cHttp::dummy(){
-    
+void http_server::set_storage_adapter(storage_adapter* sa){
+    http_server::_sa = sa;
 }

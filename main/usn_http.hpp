@@ -2,6 +2,7 @@
     #define USN_HTTP_HPP
 
     #include "esp_http_server.h"
+    #include "usn_storage.hpp"
 
     #define MAX_PARAMS 8
 
@@ -10,19 +11,20 @@
         char vals[MAX_PARAMS][32]; 
     } paramset_t;
 
-    class cHttp{
+    class http_server{
         private:
-            static httpd_uri_t uri_get;
+            static httpd_uri_t root_get;
             static httpd_uri_t spiffs_get;
-            static constexpr char *TAG = (char*)"HTTP";
+            static constexpr char *TAG = (char*)"http_server";
             static paramset_t* _parseURI(httpd_req_t *req);
+            static storage_adapter* _sa;
         public:
-            cHttp();
+            http_server();
             static httpd_handle_t* start_webserver();
             static void stop_webserver(httpd_handle_t server);
             static esp_err_t get_handler(httpd_req_t *req);
             static esp_err_t spiffs_get_handler(httpd_req_t *req);
-            void dummy();
+            static void set_storage_adapter(storage_adapter* sa);
     };
 
 #endif

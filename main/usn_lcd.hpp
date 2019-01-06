@@ -101,6 +101,7 @@
 
     class display_t{
         private:
+            static constexpr char *TAG = (char*)"display_t";
             static constexpr uint8_t pinRS  = LCD_RS;
             static constexpr uint8_t pinRW  = LCD_RW;
             static constexpr uint8_t pinEN  = LCD_EN;
@@ -124,8 +125,9 @@
 
     class display_message_t{
         private:
-            char line1[16];
-            char line2[16];
+            static constexpr char *TAG = (char*)"display_message_t";
+            char _line1[16];
+            char _line2[16];
             void _init();
         public:
             display_message_t();
@@ -133,15 +135,13 @@
             void printToSerial();
             const char* get_line1();
             const char* get_line2();
-            //void set_line1(const char* format, ...);
-            //void set_line2(const char* format, ...);
     };
 
     class display_buffer_t{
         private: 
-            SemaphoreHandle_t semaphore;
-            QueueHandle_t buffer = 0;
-            uint8_t len = 0;
+            static constexpr char *TAG = (char*)"display_buffer_t";
+            QueueHandle_t _buffer = 0;
+            uint8_t _len = 0;
         public:
             display_buffer_t();
             void enqueue(display_message_t* message); //mutex   (add)
