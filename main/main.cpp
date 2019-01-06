@@ -2,10 +2,14 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 
+
+
 #include "usn_storage.hpp"
 #include "usn_wifi.hpp"
 #include "usn_http.hpp"
 #include "usn_lcd.hpp"
+
+
 
 display_buffer_t* display_buffer = new display_buffer_t();
 wifi_adapter* wifi = new wifi_adapter();

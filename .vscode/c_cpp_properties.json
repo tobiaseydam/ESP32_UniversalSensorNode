@@ -10,7 +10,15 @@
                 "D:/Projekte/07_ESP32_Toolchain/msys32/opt/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include",
                 "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components",
                 "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/log/include",
-                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/json/cJSON"
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/json/cJSON",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp_http_server/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp_https_server/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/openssl/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp32/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp_event/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/freertos/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/tcpip_adapter/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/spiffs/include"
             ],
             "intelliSenseMode": "clang-x64",
             "browse": {
@@ -22,7 +30,15 @@
                     "D:/Projekte/07_ESP32_Toolchain/msys32/opt/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include",
                     "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components",
                     "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/log/include",
-                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/json/cJSON"
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/json/cJSON",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp_http_server/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp_https_server/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/openssl/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp32/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp_event/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/freertos/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/tcpip_adapter/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/spiffs/include"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": "${workspaceRoot}/.vscode/browse.vc.db"
