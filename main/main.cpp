@@ -8,6 +8,7 @@
 #include "usn_wifi.hpp"
 #include "usn_http.hpp"
 #include "usn_lcd.hpp"
+#include "usn_aws_iot.hpp"
 
 
 
@@ -15,6 +16,7 @@ display_buffer_t* display_buffer = new display_buffer_t();
 wifi_adapter* wifi = new wifi_adapter();
 storage_adapter* stor = new storage_adapter();
 http_server* http = new http_server();
+//aws_iot_adapter* aws = new aws_iot_adapter();
 
 extern "C" {
     void app_main(void);
@@ -28,7 +30,9 @@ void app_main(){
     stor->init();
     wifi->_init();
     http->set_storage_adapter(stor);
-
+    aws_iot_adapter::set_storage_adapter(stor);
+    aws_iot_adapter::load_certs();
+    
     display_t::lcd_init();
     TaskHandle_t xDisplayTaskHandle = NULL;
 
@@ -42,4 +46,5 @@ void app_main(){
     wifi->set_http_server(http);
     wifi->start_station(stor->get_global_value(WIFISSID),
         stor->get_global_value(WIFIPASS));
+    
 }

@@ -35,6 +35,7 @@
             bool file_exists(const char* filename);
             DIR* get_root_folder();
             FILE* get_file(const char* filename);
+            long get_file_size(const char* filename);
             const char* get_global_value(e_global_value key);
             void set_global_value(e_global_value key, const char* value);
             void set_global_value(const char* key, const char* value);

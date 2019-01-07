@@ -9,6 +9,7 @@
 #include "esp_event_loop.h"
 #include "esp_system.h"
 #include "sys/param.h"
+#include "usn_aws_iot.hpp"
 
 httpd_uri_t http_server::root_get;
 httpd_uri_t http_server::spiffs_get;
@@ -173,7 +174,7 @@ esp_err_t http_server::spiffs_get_handler(httpd_req_t *req){
         sprintf(resp, "Space: %d Bytes, used: %d Bytes<br><br>", total, used);
         httpd_resp_send_chunk(req, resp, strlen(resp));
 
-        sprintf(resp, "<table><tr><th>file</th><th>action</th></tr>");
+        sprintf(resp, "<table><tr><th>file</th><th>size</th><th>action</th></tr>");
         httpd_resp_send_chunk(req, resp, strlen(resp));
 
         DIR* root = _sa->get_root_folder();
@@ -185,6 +186,16 @@ esp_err_t http_server::spiffs_get_handler(httpd_req_t *req){
             sprintf(resp, "<a href='?file=/spiffs/%s&action=open'>%s</a>", ent->d_name, ent->d_name);
             httpd_resp_send_chunk(req, resp, strlen(resp));
             
+            sprintf(resp, "</td><td>");
+            httpd_resp_send_chunk(req, resp, strlen(resp));
+
+            char spiffs_filename[64];
+            memset(spiffs_filename, '\0', 64);
+            strcat(spiffs_filename, "/spiffs/");
+            strcat(spiffs_filename, ent->d_name);
+            sprintf(resp, "%ld Bytes", _sa->get_file_size(spiffs_filename));
+            httpd_resp_send_chunk(req, resp, strlen(resp));
+
             sprintf(resp, "</td><td>");
             httpd_resp_send_chunk(req, resp, strlen(resp));
 

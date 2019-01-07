@@ -56,6 +56,13 @@ bool storage_adapter::file_exists(const char* filename){
     return (stat(filename, &st)==0);
 }
 
+long storage_adapter::get_file_size(const char* filename){
+    struct stat st;
+    stat(filename, &st);
+    ESP_LOGI(TAG, "File %s - size: %ld Bytes", filename, st.st_size);
+    return st.st_size;
+}
+
 DIR* storage_adapter::get_root_folder(){
     return opendir("/spiffs");
 }
