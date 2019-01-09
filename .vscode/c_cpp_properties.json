@@ -12,13 +12,15 @@
                 "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/log/include",
                 "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/json/cJSON",
                 "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp_http_server/include",
-                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp_https_server/include",
                 "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/openssl/include",
                 "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp32/include",
                 "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp_event/include",
                 "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/freertos/include",
                 "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/tcpip_adapter/include",
-                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/spiffs/include"
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/spiffs/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/aws_iot/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/aws_iot/aws-iot-device-sdk-embedded-C/include",
+                "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/mbedtls/mbedtls/include"
             ],
             "intelliSenseMode": "clang-x64",
             "browse": {
@@ -32,13 +34,15 @@
                     "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/log/include",
                     "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/json/cJSON",
                     "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp_http_server/include",
-                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp_https_server/include",
                     "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/openssl/include",
                     "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp32/include",
                     "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/esp_event/include",
                     "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/freertos/include",
                     "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/tcpip_adapter/include",
-                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/spiffs/include"
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/spiffs/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/aws_iot/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/aws_iot/aws-iot-device-sdk-embedded-C/include",
+                    "D:/Projekte/07_ESP32_Toolchain/msys32/home/Tobias/esp-idf/components/mbedtls/mbedtls/include"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": "${workspaceRoot}/.vscode/browse.vc.db"

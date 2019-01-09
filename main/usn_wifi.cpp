@@ -13,6 +13,7 @@
 
 #include "usn_storage.hpp"
 #include "usn_lcd.hpp"
+#include "usn_aws_iot.hpp"
 
 #include <string.h>
 
@@ -88,6 +89,7 @@ esp_err_t wifi_adapter::_event_handler(void *ctx, system_event_t *event){
             if(_http != NULL){
                 _http->start_webserver();
             }
+            xTaskCreatePinnedToCore(&aws_iot_adapter::task, "aws_iot_task", 9216, NULL, 5, NULL, 1);
             break;
         
         case SYSTEM_EVENT_AP_START:
